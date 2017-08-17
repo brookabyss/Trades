@@ -19,7 +19,8 @@ namespace Trades.Models
         [Compare("Password",ErrorMessage="Confirm password doesn't match password")]
         public string ConfirmPassword {get;set;}
         [Required]
-        [MinLength(2, ErrorMessage="Username has to be 2 characters in length at least")]
+        [MinLength(3, ErrorMessage="Username has to be 3 characters in length at least")]
+        [MaxLength(20, ErrorMessage="Username has to be less than 20 characters in length.")]
         public string Username {get;set;}
         
     }

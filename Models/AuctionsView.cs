@@ -15,6 +15,7 @@ namespace Trades.Models
         public int StartingBid {get;set;}
         
        [Required]
+       [DateRange(ErrorMessage="Auction end date has to be from the future.")]
         public DateTime EndDate {get;set;}
         
     }

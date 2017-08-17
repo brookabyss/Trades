@@ -111,7 +111,8 @@ namespace Trades.Controllers
         public IActionResult Show(){
            int? Id=HttpContext.Session.GetInt32("UserId");
            if(Id!=null){
-              ViewBag.Auctions= GetAuctions();
+              var auctions= GetAuctions().OrderBy(a=>a.EndDate);
+              ViewBag.Auctions= auctions;
              ViewBag.User=GetUser(); 
              return View("Show");
            }
@@ -158,9 +159,10 @@ namespace Trades.Controllers
 
         // Show Auction
         [HttpGet]
-        [Route("Auction/show/{auctionId}")]
+        [Route("Auction/{auctionId}")]
         public IActionResult ShowAuction(int auctionId){
-
+            ViewBag.errors= new List<string>();
+            System.Console.WriteLine("Heelo show");
             Auctions auction= _context.Auctions
                             .Include(a=>a.Users).
                             SingleOrDefault(a =>  a.AuctionsId==auctionId);
@@ -170,6 +172,9 @@ namespace Trades.Controllers
                     .Include(a=>a.Users)
                     .OrderByDescending(a=>a.CreatedAt)
                     .SingleOrDefault(a=>a.AuctionsId==auction.AuctionsId);
+            List<Bids> bids= new List<Bids>();
+            bids.Add(bid);
+            ViewBag.Bids=bids;
             ViewBag.CurrentBid= bid;
             return View("Auction");
 
@@ -198,8 +203,13 @@ namespace Trades.Controllers
                  ViewBag.errors.Add("Bid higher");
                 return View("Auction");
             }
+            else if(currentUser.UsersId==auction.UsersId){
+                 ViewBag.errors.Add("You can't bid on your own post");
+                return View("Auction");
+            }
             else{
                 auction.StartingBid=Amount;
+                // currentUser.Wallet-=Amount;
                 Bids newBid= new Bids{
                     Amount= Amount,
                     UsersId= currentUser.UsersId,
@@ -209,12 +219,53 @@ namespace Trades.Controllers
                    
                 };
                 _context.Bids.Add(newBid);
+                
+                DateTime datenow= DateTime.Now;
+            //    Bids bid= _context.Bids
+            //                         .Include(a=>a.Auctions)
+            //                         .Include(a=>a.Users)
+            //                         .OrderByDescending(a=>a.CreatedAt).First();
+            
+                if (auction.EndDate< datenow){
+                    Users Seller= _context.Users.SingleOrDefault(a=>a.UsersId==auction.UsersId);
+                    Seller.Wallet+=Amount;
+                    currentUser.Wallet-=Amount;
+                    _context.Auctions.Remove(auction);
+                }
                 _context.SaveChanges();
+                
                 return RedirectToAction("Show");
             }
         }
+        // Check Bid status 
 
+        public bool checkbid(int Bid){
+             List<Bids> bids= _context.Bids
+                    .Include(a=>a.Auctions)
+                    .Include(a=>a.Users)
+                    .OrderByDescending(a=>a.CreatedAt)
+                    .ToList();
+            Bids bid=bids.First();
+            DateTime datenow= DateTime.Now;
+            if (bid!=null && bid.Auctions.EndDate< datenow){
+                return true;
+            }
+            else{
+                return false;
+            }
+            
+        }
 
+        [HttpGet]
+        [Route("Auction/delete/{auctionId}")]
+        public IActionResult CreateBid(int auctionId)
+        {
+            Auctions auction= _context.Auctions.
+                            SingleOrDefault(a =>  a.AuctionsId==auctionId);
+            _context.Auctions.Remove(auction);
+            
+            return RedirectToAction("Show");
+        }
 
         [HttpGet]
         [Route("user/logout")]

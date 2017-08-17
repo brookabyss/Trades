@@ -1,3 +1,7 @@
+@model Trades.Models.Bids
+@using Trades
+
+
 <a asp-controller="User" asp-action="Logout">Logout</a> 
 <a asp-controller="User" asp-action="Show">Home</a> 
 
@@ -9,11 +13,19 @@
 
 <h1>@ViewBag.Auction.ProductName</h1>
 <p>Created by: @ViewBag.Auction.Users.FirstName</p>
+@{
+    TimeFormat newFormat= new TimeFormat();
+    var timeRem= newFormat.TimeRemaining(ViewBag.Auction.EndDate);
+}
 
+<p>New format  @timeRem</p>
 <h2>Time Remaining @ViewBag.Auction.EndDate</h2>
 <p>@ViewBag.Auction.Description</p>
 <p>Current Highest Bid : @ViewBag.Auction.StartingBid</p>
-<p>By @ViewBag.CurrentBid.Users.FirstName</p>
+@if(ViewBag.CurrentBid!=null){
+    <p>By @ViewBag.CurrentBid.Users.FirstName</p>
+}
+
 
 <form asp-controller="User" asp-action="CreateBid" asp-route-auctionId=@ViewBag.Auction.AuctionsId method="post">
     <input name="Amount" type="number">

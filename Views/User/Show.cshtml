@@ -1,6 +1,6 @@
 <p>Show page</p>
 <a asp-controller="User" asp-action="Logout">Logout</a> 
-<p>@ViewBag.User.FirstName</p>
+<p>Hello @ViewBag.User.FirstName</p>
 
 <h1>Current Auctions</h1>
 
@@ -13,13 +13,14 @@
         <th>Action</th>
     </tr>
     @foreach(var auction in ViewBag.Auctions){
+        int Id= @auction.AuctionsId;
         <tr>
-            <td><a asp-controller="User" asp-action="Auction" asp-route-auctionId=@auction.AuctionsId>@auction.ProductName</a></td>
+            <td><a asp-controller="User" asp-action="ShowAuction" asp-route-auctionId=@Id>@auction.ProductName</a></td>
              <td>@auction.Users.FirstName @auction.Users.LastName</td>
               <td>@auction.StartingBid</td>
                <td>@auction.EndDate</td>
                <td> @if(auction.UsersId==ViewBag.User.UsersId){
-                   <a asp-controller="User" asp-action="Delete" asp-route-Id=@auction.AuctionsId>Delete</a>
+                   <a asp-controller="User" asp-action="DeleteAuction" asp-route-auctionId=@Id>Delete</a>
                    }
                     
                 </td>
