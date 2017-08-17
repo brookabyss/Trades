@@ -23,7 +23,7 @@
 <p>@ViewBag.Auction.Description</p>
 <p>Current Highest Bid : @ViewBag.Auction.StartingBid</p>
 @if(ViewBag.CurrentBid!=null){
-    <p>By @ViewBag.CurrentBid.Users.FirstName</p>
+    <p>By Mr/Mrs @ViewBag.CurrentBid.Users.FirstName @ViewBag.CurrentBid.Users.LastName</p>
 }
 
 

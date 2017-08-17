@@ -1,3 +1,4 @@
+@using Trades
 <p>Show page</p>
 <a asp-controller="User" asp-action="Logout">Logout</a> 
 <p>Hello @ViewBag.User.FirstName</p>
@@ -12,13 +13,17 @@
         <th>TimeRemaining</th>
         <th>Action</th>
     </tr>
+    @{
+        TimeFormat newFormat= new TimeFormat();
+    }
     @foreach(var auction in ViewBag.Auctions){
         int Id= @auction.AuctionsId;
+        var timeRem= newFormat.TimeRemaining(@auction.EndDate);
         <tr>
             <td><a asp-controller="User" asp-action="ShowAuction" asp-route-auctionId=@Id>@auction.ProductName</a></td>
              <td>@auction.Users.FirstName @auction.Users.LastName</td>
               <td>@auction.StartingBid</td>
-               <td>@auction.EndDate</td>
+               <td>@timeRem</td>
                <td> @if(auction.UsersId==ViewBag.User.UsersId){
                    <a asp-controller="User" asp-action="DeleteAuction" asp-route-auctionId=@Id>Delete</a>
                    }

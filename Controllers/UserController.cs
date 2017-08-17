@@ -89,6 +89,19 @@ namespace Trades.Controllers
         public IActionResult Login(string Username, string Password){
             ViewBag.Errors=new List<string>();
             ViewBag.errors=new List<string>();
+            // int errors= 0;
+            // if(Username.Length<3 || Username.Length>20){
+            //     ViewBag.errors.Add("Username length has to be betweeen 3 and 20 charcters");
+            //     errors+=1;
+            // }
+            // if (Password.Length<8){
+            //     ViewBag.errors.Add("Username or password is incorrect");
+            //     errors+=1;
+            // }
+            // if(errors!=0){
+            //      ViewBag.Errors["Errors"]=ViewBag.errors;
+            //     return View("Index");
+            // }
                 Users ReturnedUser= _context.Users.SingleOrDefault(user=>user.Username==Username);
                 if(ReturnedUser.Password==Password){
                     HttpContext.Session.SetInt32("UserId",(int)ReturnedUser.UsersId);
@@ -171,7 +184,7 @@ namespace Trades.Controllers
                     .Include(a=>a.Auctions)
                     .Include(a=>a.Users)
                     .OrderByDescending(a=>a.CreatedAt)
-                    .SingleOrDefault(a=>a.AuctionsId==auction.AuctionsId);
+                    .Where(a=>a.AuctionsId==auction.AuctionsId).First();
             List<Bids> bids= new List<Bids>();
             bids.Add(bid);
             ViewBag.Bids=bids;
@@ -209,6 +222,7 @@ namespace Trades.Controllers
             }
             else{
                 auction.StartingBid=Amount;
+                //Intentionally not decrementing wallet because we want to take it out once a sell happens not when they bid
                 // currentUser.Wallet-=Amount;
                 Bids newBid= new Bids{
                     Amount= Amount,
