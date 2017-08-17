@@ -1,0 +1,26 @@
+@model Trades.Models.AuctionsView
+
+@{
+        foreach(var error in ViewBag.Errors)
+            {
+                if(@error.Errors.Count > 0)
+                {
+                    <p>@error.Errors[0].ErrorMessage</p>
+                }
+            }
+ }
+
+<a asp-controller="User" asp-action="Logout">Logout</a> 
+<a asp-controller="User" asp-action="Show">Home</a> 
+<form asp-controller="User" asp-action="CreateAuction" method="post">
+    <label for="">Product Name</label>
+    <input asp-for="ProductName"/><br>
+    <label for="">Starting Bid</label>
+    <input asp-for="StartingBid"/><br>
+    <label for="">Description</label>
+    <textarea asp-for="Description"></textarea>
+    <label for="">End date</label>
+    <input asp-for="EndDate" type="date"/><br>
+    <button type="submit">Create Auction</button>
+
+</form>

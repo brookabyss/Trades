@@ -1,0 +1,34 @@
+<p>Show page</p>
+<a asp-controller="User" asp-action="Logout">Logout</a> 
+<p>@ViewBag.User.FirstName</p>
+
+<h1>Current Auctions</h1>
+
+<table>
+    <tr>
+        <th>Product</th>
+        <th>Seller</th>
+        <th>TopBid</th>
+        <th>TimeRemaining</th>
+        <th>Action</th>
+    </tr>
+    @foreach(var auction in ViewBag.Auctions){
+        <tr>
+            <td><a asp-controller="User" asp-action="Auction" asp-route-auctionId=@auction.AuctionsId>@auction.ProductName</a></td>
+             <td>@auction.Users.FirstName @auction.Users.LastName</td>
+              <td>@auction.StartingBid</td>
+               <td>@auction.EndDate</td>
+               <td> @if(auction.UsersId==ViewBag.User.UsersId){
+                   <a asp-controller="User" asp-action="Delete" asp-route-Id=@auction.AuctionsId>Delete</a>
+                   }
+                    
+                </td>
+
+        </tr>
+        
+    }
+</table>
+
+<a asp-controller="User" asp-action="ToAuction" >New Auction</a>
+
+<h3>Your Current Wallet: $ @ViewBag.User.Wallet</h3>
