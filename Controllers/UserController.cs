@@ -290,8 +290,9 @@ namespace Trades.Controllers
 
         [HttpGet]
         [Route("Auction/delete/{auctionId}")]
-        public IActionResult CreateBid(int auctionId)
+        public IActionResult DeleteAuction(int auctionId)
         {
+            System.Console.WriteLine("Delete the Auction Auctions***************");
             int? Id=HttpContext.Session.GetInt32("UserId");
             if(Id==null){
                 return RedirectToAction("Index");
@@ -299,7 +300,14 @@ namespace Trades.Controllers
             else{
                  Auctions auction= _context.Auctions.
                             SingleOrDefault(a =>  a.AuctionsId==auctionId);
+                 
+                 List <Bids> bids= _context.Bids.Where(a=>a.AuctionsId==auction.AuctionsId).ToList();
+                 foreach(var bid in bids){
+                     _context.Bids.Remove(bid);
+                 }
+                
                  _context.Auctions.Remove(auction);
+                 _context.SaveChanges();
             
                 return RedirectToAction("Show");
 

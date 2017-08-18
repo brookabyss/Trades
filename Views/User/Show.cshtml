@@ -25,7 +25,7 @@
               <td>@auction.StartingBid</td>
                <td>@timeRem</td>
                <td> @if(auction.UsersId==ViewBag.User.UsersId){
-                   <a asp-controller="User" asp-action="DeleteAuction" asp-route-auctionId=@Id>Delete</a>
+                   <a asp-controller="User" asp-action="DeleteAuction" asp-route-auctionId=@auction.AuctionsId>Delete</a>
                    }
                     
                 </td>
