@@ -174,22 +174,30 @@ namespace Trades.Controllers
         [HttpGet]
         [Route("Auction/{auctionId}")]
         public IActionResult ShowAuction(int auctionId){
-            ViewBag.errors= new List<string>();
-            System.Console.WriteLine("Heelo show");
-            Auctions auction= _context.Auctions
+            int? Id=HttpContext.Session.GetInt32("UserId");
+            if(Id==null){
+                return RedirectToAction("Index");
+            }
+            else{
+                ViewBag.errors= new List<string>();
+                System.Console.WriteLine("Heelo show");
+                Auctions auction= _context.Auctions
                             .Include(a=>a.Users).
                             SingleOrDefault(a =>  a.AuctionsId==auctionId);
                             ViewBag.Auction= auction;
-            Bids bid= _context.Bids
+                Bids bid= _context.Bids
                     .Include(a=>a.Auctions)
                     .Include(a=>a.Users)
                     .OrderByDescending(a=>a.CreatedAt)
-                    .Where(a=>a.AuctionsId==auction.AuctionsId).First();
-            List<Bids> bids= new List<Bids>();
-            bids.Add(bid);
-            ViewBag.Bids=bids;
-            ViewBag.CurrentBid= bid;
-            return View("Auction");
+                    .Where(a=>a.AuctionsId==auction.AuctionsId).SingleOrDefault(a=>a.AuctionsId==auction.AuctionsId);
+                    List<Bids> bids= new List<Bids>();
+                    bids.Add(bid);
+                    ViewBag.Bids=bids;
+                    ViewBag.CurrentBid= bid;
+                    return View("Auction");
+
+            }
+            
 
         }
 
@@ -198,6 +206,12 @@ namespace Trades.Controllers
         [Route("Auction/bid/{auctionId}")]
         public IActionResult CreateBid(int auctionId, double Amount)
         {
+            int? Id=HttpContext.Session.GetInt32("UserId");
+            if(Id==null){
+                return RedirectToAction("Index");
+            }
+            else{
+                
             ViewBag.errors=new List<string>();
             if(Amount <= 0 ){
                 ViewBag.errors.Add("Bid has to be higher than 0.");
@@ -233,23 +247,27 @@ namespace Trades.Controllers
                    
                 };
                 _context.Bids.Add(newBid);
-                
+                _context.SaveChanges();
                 DateTime datenow= DateTime.Now;
-            //    Bids bid= _context.Bids
-            //                         .Include(a=>a.Auctions)
-            //                         .Include(a=>a.Users)
-            //                         .OrderByDescending(a=>a.CreatedAt).First();
+               Bids bid= _context.Bids
+                                    .Include(a=>a.Auctions)
+                                    .Include(a=>a.Users)
+                                    .OrderByDescending(a=>a.CreatedAt).First();
             
                 if (auction.EndDate< datenow){
                     Users Seller= _context.Users.SingleOrDefault(a=>a.UsersId==auction.UsersId);
                     Seller.Wallet+=Amount;
                     currentUser.Wallet-=Amount;
                     _context.Auctions.Remove(auction);
+                    _context.Bids.Remove(bid);
                 }
                 _context.SaveChanges();
                 
                 return RedirectToAction("Show");
+                }
+                
             }
+          
         }
         // Check Bid status 
 
@@ -274,11 +292,19 @@ namespace Trades.Controllers
         [Route("Auction/delete/{auctionId}")]
         public IActionResult CreateBid(int auctionId)
         {
-            Auctions auction= _context.Auctions.
+            int? Id=HttpContext.Session.GetInt32("UserId");
+            if(Id==null){
+                return RedirectToAction("Index");
+            }
+            else{
+                 Auctions auction= _context.Auctions.
                             SingleOrDefault(a =>  a.AuctionsId==auctionId);
-            _context.Auctions.Remove(auction);
+                 _context.Auctions.Remove(auction);
             
-            return RedirectToAction("Show");
+                return RedirectToAction("Show");
+
+            }
+           
         }
 
         [HttpGet]
